@@ -59,6 +59,7 @@ class OptimizedWordFrequencyAnalyzer:
         
         # Track changes to update linked lists
         changes = {}
+        changed_words = set()
         
         # Add words to main dictionary
         for word in words:
@@ -71,13 +72,18 @@ class OptimizedWordFrequencyAnalyzer:
                 changes[old_count] = changes.get(old_count, 0) - 1
             changes[new_count] = changes.get(new_count, 0) + 1
             
+            # Track which words changed frequency
+            if old_count != new_count:
+                changed_words.add(word)
+            
             self.total_words += 1
         
         # Update frequency count list
         self._update_frequency_counts(changes)
         
-        # Update top 5 list
-        self._update_top_five()
+        # Update top 5 list incrementally
+        if changed_words:
+            self._update_top_five_incremental(changed_words)
     
     def _update_frequency_counts(self, changes: Dict[int, int]) -> None:
         """Update the frequency count list based on changes."""
@@ -149,8 +155,29 @@ class OptimizedWordFrequencyAnalyzer:
         else:
             self.freq_tail = node.prev
     
-    def _update_top_five(self) -> None:
-        """Update the top 5 list based on current word counts."""
+    def _update_top_five_incremental(self, changed_words: set) -> None:
+        """Update top 5 list incrementally based on changed words."""
+        # Get current top 5 as a list for easier manipulation
+        current_top5 = self._get_current_top5_list()
+        
+        # If no current top 5, build from scratch
+        if not current_top5:
+            self._build_initial_top5()
+            return
+        
+        # Check if any changed word should be in top 5
+        for word in changed_words:
+            freq = self.word_counts[word]
+            
+            # Check if this word should be in top 5
+            if self._should_be_in_top5(word, freq, current_top5):
+                self._insert_or_update_in_top5(word, freq, current_top5)
+        
+        # Rebuild linked list from updated list
+        self._rebuild_top5_linked_list(current_top5)
+    
+    def _build_initial_top5(self) -> None:
+        """Build initial top 5 list from scratch."""
         # Get all words with their frequencies
         all_words = list(self.word_counts.items())
         
@@ -160,12 +187,56 @@ class OptimizedWordFrequencyAnalyzer:
         # Take top 5
         top_five = all_words[:5]
         
+        # Build linked list
+        self._rebuild_top5_linked_list(top_five)
+    
+    def _get_current_top5_list(self) -> List[Tuple[str, int]]:
+        """Get current top 5 as a list."""
+        result = []
+        current = self.top_five_head
+        while current:
+            result.append((current.word, current.frequency))
+            current = current.next
+        return result
+    
+    def _should_be_in_top5(self, word: str, freq: int, current_top5: list) -> bool:
+        """Check if a word should be in the top 5."""
+        # If we have less than 5 words, always include
+        if len(current_top5) < 5:
+            return True
+        
+        # If frequency is higher than the 5th word, include it
+        if freq > current_top5[4][1]:
+            return True
+        
+        # If frequency equals the 5th word, use alphabetical tie-breaker
+        if freq == current_top5[4][1] and word < current_top5[4][0]:
+            return True
+        
+        return False
+    
+    def _insert_or_update_in_top5(self, word: str, freq: int, current_top5: list) -> None:
+        """Insert or update a word in the top 5 list."""
+        # Remove existing entry if it exists
+        current_top5[:] = [(w, f) for w, f in current_top5 if w != word]
+        
+        # Add new entry
+        current_top5.append((word, freq))
+        
+        # Sort by frequency (desc) then alphabetically (asc)
+        current_top5.sort(key=lambda x: (-x[1], x[0]))
+        
+        # Keep only top 5
+        current_top5[:] = current_top5[:5]
+    
+    def _rebuild_top5_linked_list(self, top5_list: List[Tuple[str, int]]) -> None:
+        """Rebuild the top 5 linked list from a list."""
         # Clear existing top 5 list
         self.top_five_head = None
         self.top_five_tail = None
         
         # Build new top 5 list
-        for word, frequency in top_five:
+        for word, frequency in top5_list:
             new_node = TopFiveNode(word, frequency)
             
             if not self.top_five_head:
