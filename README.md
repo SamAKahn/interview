@@ -78,10 +78,16 @@ class TopFiveNode:
 ```
 
 **How it works:**
-1. **Every time words are added**, the system recalculates the top 5
-2. **Sorts all words** by frequency (descending), then alphabetically
-3. **Takes the first 5** and stores them in a linked list
+1. **Incremental updates** - only recalculates when necessary
+2. **Smart detection** - checks if changed words should be in top 5
+3. **Efficient insertion** - maintains sorted order within the list
 4. **Retrieval is O(1)** - just traverse the pre-computed list
+
+**Optimization Details:**
+- **Only processes changed words** instead of entire dictionary
+- **Checks against 5th place** to determine if update is needed
+- **Maintains alphabetical tie-breaking** for equal frequencies
+- **Falls back to full sort** only for initial build
 
 **Example:**
 ```
@@ -184,6 +190,7 @@ The system uses **two specialized linked lists** instead of storing complete cop
 | Get top 5 | O(1) | O(1) |
 | Get lowest frequency | O(1) | O(1) |
 | Get median frequency | O(k log k) where k = unique words | O(k) |
+| **Top 5 update** | **O(5) for most updates** | **O(5)** |
 
 ## Files in This Project
 

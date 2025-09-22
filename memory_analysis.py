@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Detailed memory analysis comparing original vs linked list approaches.
+Memory analysis for the optimized linked list word frequency analyzer.
 """
 
 import sys
@@ -19,35 +19,35 @@ def analyze_memory_growth():
     for num_additions in test_cases:
         print(f"Testing with {num_additions} word additions:")
         
-    # Optimized approach
-    optimized = OptimizedWordFrequencyAnalyzer()
-    for i in range(num_additions):
-        optimized.add_words(f"word{i}, word{i+1}, word{i+2}")
-    
-    # Calculate total memory for optimized approach
-    optimized_memory = sys.getsizeof(optimized.word_counts)
-    
-    # Top 5 list memory
-    top5_memory = 0
-    current = optimized.top_five_head
-    while current:
-        top5_memory += sys.getsizeof(current)
-        current = current.next
-    
-    # Frequency count list memory
-    freq_memory = 0
-    current = optimized.freq_head
-    while current:
-        freq_memory += sys.getsizeof(current)
-        current = current.next
-    
-    total_optimized = optimized_memory + top5_memory + freq_memory
-    
-    print(f"  Optimized: {total_optimized} bytes")
-    print(f"    - Main dictionary: {optimized_memory} bytes")
-    print(f"    - Top 5 list: {top5_memory} bytes")
-    print(f"    - Frequency counts: {freq_memory} bytes")
-    print()
+        # Optimized approach
+        optimized = OptimizedWordFrequencyAnalyzer()
+        for i in range(num_additions):
+            optimized.add_words(f"word{i}, word{i+1}, word{i+2}")
+        
+        # Calculate total memory for optimized approach
+        optimized_memory = sys.getsizeof(optimized.word_counts)
+        
+        # Top 5 list memory
+        top5_memory = 0
+        current = optimized.top_five_head
+        while current:
+            top5_memory += sys.getsizeof(current)
+            current = current.next
+        
+        # Frequency count list memory
+        freq_memory = 0
+        current = optimized.freq_head
+        while current:
+            freq_memory += sys.getsizeof(current)
+            current = current.next
+        
+        total_optimized = optimized_memory + top5_memory + freq_memory
+        
+        print(f"  Optimized: {total_optimized} bytes")
+        print(f"    - Main dictionary: {optimized_memory} bytes")
+        print(f"    - Top 5 list: {top5_memory} bytes")
+        print(f"    - Frequency counts: {freq_memory} bytes")
+        print()
 
 
 def analyze_memory_components():

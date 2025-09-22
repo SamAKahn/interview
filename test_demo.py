@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Demo script to show how the WordFrequencyAnalyzer works interactively.
-This simulates user input to demonstrate the functionality.
+Demo script to show how the Optimized WordFrequencyAnalyzer works interactively.
+This simulates user input to demonstrate the functionality with incremental updates.
 """
 
 from optimized_linked_list_analyzer import OptimizedWordFrequencyAnalyzer
 
 def demo_interactive_usage():
-    """Demonstrate the interactive functionality of WordFrequencyAnalyzer."""
+    """Demonstrate the interactive functionality of OptimizedWordFrequencyAnalyzer."""
     
     print("=== Word Frequency Analyzer Demo ===\n")
     
